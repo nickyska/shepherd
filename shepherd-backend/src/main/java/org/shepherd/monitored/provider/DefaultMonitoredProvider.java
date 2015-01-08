@@ -1,15 +1,5 @@
 package org.shepherd.monitored.provider;
 
-import org.shepherd.monitored.Monitored;
-import org.shepherd.monitored.MonitoringTask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.type.filter.AssignableTypeFilter;
-import org.springframework.stereotype.Component;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -19,6 +9,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.shepherd.monitored.Monitored;
+import org.shepherd.monitored.MonitoringTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AssignableTypeFilter;
+import org.springframework.stereotype.Component;
 
 /**
  * 
@@ -37,11 +38,17 @@ public class DefaultMonitoredProvider implements MonitoredProvider {
 
 	private Map<Class<Monitored>, Collection<Class<MonitoringTask<? extends Monitored>>>> providerMap;
 
+	private Collection<Class<Monitored>> monitoredWIthDefaultConstractor;
+
 	@PostConstruct
 	protected void init() throws ClassNotFoundException {
+		
 		this.providerMap = new HashMap<Class<Monitored>, Collection<Class<MonitoringTask<? extends Monitored>>>>();
+		this.monitoredWIthDefaultConstractor = new ArrayList<Class<Monitored>>(); 
+		
 		autoscanMonitored();
 		autoscanMonitoringTasks();
+		filterMonitoredClasses();
 	}
 
 	protected void autoscanMonitored() throws ClassNotFoundException {
@@ -122,6 +129,27 @@ public class DefaultMonitoredProvider implements MonitoredProvider {
 	public <T extends Monitored> Collection<Class<MonitoringTask<T>>> getAllMonitoringTaskClasses(Class<T> monitoredClass) {
 		Collection monitoredMonitoringTaskClasses = this.providerMap.get(monitoredClass);
 		return Collections.unmodifiableCollection(monitoredMonitoringTaskClasses);
+	}
+	//if Monitored class doesn't have a default constructor remove it from Vaadin view create
+	private void filterMonitoredClasses(){
+		
+		for (Class<Monitored> monitored : this.providerMap.keySet()) {
+
+			//try to create instance, if failed there is no default constractor
+			try {
+				monitored.newInstance();
+			} catch (Exception e) {
+				LOGGER.warn("Couldn't locate default constractor ,skipping class. Either add default constractor or add manually bean to the context {}", new Object[] { monitored });
+				continue;
+			}
+			
+			this.monitoredWIthDefaultConstractor.add(monitored);
+		}
+	}
+	
+	@Override
+	public <T extends Monitored> Collection<Class<Monitored>> getFilteredMonitoringClasses() {
+		return this.monitoredWIthDefaultConstractor;
 	}
 
 }

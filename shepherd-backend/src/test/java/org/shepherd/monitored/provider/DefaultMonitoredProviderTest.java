@@ -29,5 +29,10 @@ public class DefaultMonitoredProviderTest extends AbstractMonitoringTest {
 		Assert.assertEquals(1, allMonitoringTaskClasses.size());
 		Assert.assertEquals(ExpressionJmxTask.class, allMonitoringTaskClasses.iterator().next());
 	}
+	@Test
+	public void testDefaultMonitoredProviderFiltering() {
+		Collection<Class<Monitored>> filtered = this.monitoredProvider.getFilteredMonitoringClasses();
+		Assert.assertEquals(2, filtered.size());
+	}
 
 }

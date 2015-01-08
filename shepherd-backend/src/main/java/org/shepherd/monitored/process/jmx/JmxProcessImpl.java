@@ -41,6 +41,11 @@ public class JmxProcessImpl implements JmxProcess {
 
 	Map<String, String[]> environment;
 
+	
+	public JmxProcessImpl() {
+		super();
+	}
+
 	public JmxProcessImpl(String id, String name, String hostname, int port) throws IOException {
 		this(id, name, hostname, port, null, null);
 	}

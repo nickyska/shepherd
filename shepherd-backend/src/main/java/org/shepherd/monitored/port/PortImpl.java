@@ -7,6 +7,7 @@ import org.shepherd.monitored.MonitoredException;
 import org.shepherd.monitored.annotation.MonitoredDisplayName;
 import org.shepherd.monitored.annotation.ParamDisplayName;
 import org.shepherd.monitored.annotation.UICreationPoint;
+import org.shepherd.monitored.annotation.UIField;
 import org.springframework.util.Assert;
 
 /**
@@ -18,15 +19,26 @@ import org.springframework.util.Assert;
 public class PortImpl implements Port {
 
 	
+	
+
+
 	protected String id;
 	
+	@UIField(displayName = "Name")
 	protected String name;
 
+	@UIField(displayName = "Host")
 	protected String hostname;
 
+	@UIField(displayName = "Port")
 	protected int port;
 	
+	@UIField(displayName = "Port type")
 	protected PortType portType;
+	
+	public PortImpl() {
+		super();
+	}
 	
 	@UICreationPoint(params = {  @ParamDisplayName(index = 0, displayName = "Id"),@ParamDisplayName(index = 1, displayName = "Name"), 
 			@ParamDisplayName(index = 2, displayName = "Hostname"), 
