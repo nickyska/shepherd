@@ -1,5 +1,6 @@
 package org.shepherd.monitored.provider;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Component;
  * @since Dec 28, 2014
  * @version 0.1.0
  */
-@Component
+@Component(value ="defaultMonitoredProvider")
 public class DefaultMonitoredProvider implements MonitoredProvider {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMonitoredProvider.class);
@@ -38,17 +39,13 @@ public class DefaultMonitoredProvider implements MonitoredProvider {
 
 	private Map<Class<Monitored>, Collection<Class<MonitoringTask<? extends Monitored>>>> providerMap;
 
-	private Collection<Class<Monitored>> monitoredWIthDefaultConstractor;
-
 	@PostConstruct
 	protected void init() throws ClassNotFoundException {
 		
 		this.providerMap = new HashMap<Class<Monitored>, Collection<Class<MonitoringTask<? extends Monitored>>>>();
-		this.monitoredWIthDefaultConstractor = new ArrayList<Class<Monitored>>(); 
 		
 		autoscanMonitored();
 		autoscanMonitoringTasks();
-		filterMonitoredClasses();
 	}
 
 	protected void autoscanMonitored() throws ClassNotFoundException {
@@ -62,13 +59,30 @@ public class DefaultMonitoredProvider implements MonitoredProvider {
 			//This cast is safe
 			Class<Monitored> clas = (Class<Monitored>)Class.forName(className);
 			if (!Modifier.isAbstract(clas.getModifiers()) && !Modifier.isInterface(clas.getModifiers())) {
-				if (!this.providerMap.containsKey(clas)) {
+				if (!this.providerMap.containsKey(clas) && hasDefaultConstractor(clas)) {
 					this.providerMap.put(clas, new ArrayList<Class<MonitoringTask<? extends Monitored>>>());
 				}
 			} else {
 				LOGGER.warn("Igonring class {}, it's abstract or interface", className);
 			}
 		}
+	}
+
+	private boolean hasDefaultConstractor(Class<Monitored> clas) {
+		
+		Constructor<?>[] constructors = clas.getConstructors();
+		
+		boolean hasDefaultConstror = false;
+		
+		for (Constructor<?> constructor : constructors) {
+			if(constructor.getParameterCount() == 0){
+				hasDefaultConstror = true;
+			}else{
+				LOGGER.warn("Couldn't locate default constractor ,skipping class. Either add default constractor or add manually bean to the context {}", new Object[] { clas });
+			}
+		}
+		
+		return hasDefaultConstror;
 	}
 
 	protected void autoscanMonitoringTasks() throws ClassNotFoundException {
@@ -130,26 +144,6 @@ public class DefaultMonitoredProvider implements MonitoredProvider {
 		Collection monitoredMonitoringTaskClasses = this.providerMap.get(monitoredClass);
 		return Collections.unmodifiableCollection(monitoredMonitoringTaskClasses);
 	}
-	//if Monitored class doesn't have a default constructor remove it from Vaadin view create
-	private void filterMonitoredClasses(){
-		
-		for (Class<Monitored> monitored : this.providerMap.keySet()) {
-
-			//try to create instance, if failed there is no default constractor
-			try {
-				monitored.newInstance();
-			} catch (Exception e) {
-				LOGGER.warn("Couldn't locate default constractor ,skipping class. Either add default constractor or add manually bean to the context {}", new Object[] { monitored });
-				continue;
-			}
-			
-			this.monitoredWIthDefaultConstractor.add(monitored);
-		}
-	}
 	
-	@Override
-	public <T extends Monitored> Collection<Class<Monitored>> getFilteredMonitoringClasses() {
-		return this.monitoredWIthDefaultConstractor;
-	}
 
 }

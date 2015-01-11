@@ -1,5 +1,15 @@
 package org.shepherd.vaadin.dashboard.view.dashboard;
 
+import org.shepherd.domain.User;
+import org.shepherd.vaadin.dashboard.component.ProfilePreferencesWindow;
+import org.shepherd.vaadin.dashboard.event.DashboardEvent.CloseOpenWindowsEvent;
+import org.shepherd.vaadin.dashboard.event.DashboardEvent.NotificationsCountUpdatedEvent;
+import org.shepherd.vaadin.dashboard.event.DashboardEvent.UserLoggedOutEvent;
+import org.shepherd.vaadin.dashboard.event.DashboardEventBus;
+import org.shepherd.vaadin.dashboard.view.dashboard.DashboardEdit.DashboardEditListener;
+import org.vaadin.spring.UIScope;
+import org.vaadin.spring.navigator.VaadinView;
+
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -25,16 +35,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-
-import org.shepherd.domain.User;
-import org.shepherd.vaadin.dashboard.component.ProfilePreferencesWindow;
-import org.shepherd.vaadin.dashboard.event.DashboardEvent.CloseOpenWindowsEvent;
-import org.shepherd.vaadin.dashboard.event.DashboardEvent.NotificationsCountUpdatedEvent;
-import org.shepherd.vaadin.dashboard.event.DashboardEvent.UserLoggedOutEvent;
-import org.shepherd.vaadin.dashboard.event.DashboardEventBus;
-import org.shepherd.vaadin.dashboard.view.dashboard.DashboardEdit.DashboardEditListener;
-import org.vaadin.spring.UIScope;
-import org.vaadin.spring.navigator.VaadinView;
 
 @SuppressWarnings("serial")
 @VaadinView(name = "Dashboard")

@@ -31,7 +31,7 @@ public class DefaultMonitoredProviderTest extends AbstractMonitoringTest {
 	}
 	@Test
 	public void testDefaultMonitoredProviderFiltering() {
-		Collection<Class<Monitored>> filtered = this.monitoredProvider.getFilteredMonitoringClasses();
+		Collection<Class<Monitored>> filtered = this.monitoredProvider.getAllMonitoredClasses();
 		Assert.assertEquals(2, filtered.size());
 	}
 

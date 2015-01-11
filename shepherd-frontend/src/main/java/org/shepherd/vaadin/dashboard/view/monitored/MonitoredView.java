@@ -116,7 +116,7 @@ public class MonitoredView extends VerticalLayout implements View {
 			ComboBox monitoredType = new ComboBox();
 			monitoredType.setCaption("Monitoring Type");
 			Map<MonitoredUIItem, Layout> monitoredItems = new HashMap<MonitoredUIItem, Layout>();
-			for (Class<Monitored> monitoredClass : MonitoredView.this.monitoredProvider.getFilteredMonitoringClasses()) {
+			for (Class<Monitored> monitoredClass : MonitoredView.this.monitoredProvider.getAllMonitoredClasses()) {
 				MonitoredUIItem item = new MonitoredUIItem(monitoredClass);
 				monitoredItems.put(item, item.getLayout());
 				monitoredType.addItem(item);

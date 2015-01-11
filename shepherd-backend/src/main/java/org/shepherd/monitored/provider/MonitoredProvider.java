@@ -31,15 +31,5 @@ public interface MonitoredProvider {
 	 */
 	public <T extends Monitored> Collection<Class<MonitoringTask<T>>> getAllMonitoringTaskClasses(Class<T> monitoredClass);
 	
-	/**
-	 * @since Jan 07, 2015
-	 * @author nickolayb
-	 * @param monitoredClass
-	 * @return Collection of monitored classes that validated and filtered according to ones logic
-	 */
-
-	public <T extends Monitored> Collection<Class<Monitored>> getFilteredMonitoringClasses();
-	
-	
 
 }
